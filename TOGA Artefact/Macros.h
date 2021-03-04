@@ -1,4 +1,4 @@
-#ifndef _MACROS_H
+#ifndef _MACROS_H	// Include guard
 #define _MACROS_H
 
 //// Macro definitions

@@ -15,8 +15,9 @@ int main() {
 	Enemy = &(game.aiBoard);
 
 	Player->displayBoard();
-	Enemy->displayBoard();
-	
+	//Enemy->displayBoard();
+	Player->placeShip(1);
+	Player->displayBoard();
 
 	return 0;
 }

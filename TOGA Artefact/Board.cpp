@@ -80,12 +80,11 @@ std::tuple<int, int> Board::placeShip(int shipSize) {
 	std::string dir;	// The direction of the ship
 	char xy;
 	
-	for (int i = 0; i < numOfShips; i++) {
-	START:
+	for (;;) { // input validation
 		for (int coord = 0; coord < 2; coord++) {
 
 			xy = (coord == 0) ? 'x' : 'y';
-			for (;;) { // input validation
+			for (;;) {
 				std::cout << "Which " << xy << " coordinate do you want the ship to start in?\n";
 
 				if (std::cin >> startCoord[coord]			// input must be int
@@ -111,12 +110,8 @@ std::tuple<int, int> Board::placeShip(int shipSize) {
 		for (;;) {
 			std::cout << "\nDo you want the ship to continue UP, RIGHT, DOWN, LEFT, or do you want to RESTART by re-entering the start coordinates?\n";
 
-			if (dir == "RESTART")
-			{
-				goto START;
-			}
-			else if (std::cin >> dir) {
-				
+			if (std::cin >> dir) {
+
 				if (dir == "UP") // if only switch worked with str
 				{
 					returnDir = std::make_tuple(0, -1);
@@ -133,6 +128,9 @@ std::tuple<int, int> Board::placeShip(int shipSize) {
 				if (dir == "DOWN") {
 					returnDir = std::make_tuple(0, 1);
 					return returnDir;
+				}
+				if (dir == "RESTART") {
+					break;
 				}
 			}
 			else { std::cout << "Please enter a valid response"; }

@@ -3,8 +3,9 @@
 #include "Game.h"
 
 #include <iostream>
+#include <tuple>
 
-Game game(10);
+Game game(20);
 
 Board* Player;
 Board* Enemy;
@@ -15,9 +16,10 @@ int main() {
 	Enemy = &(game.aiBoard);
 
 	Player->displayBoard();
-	//Enemy->displayBoard();
-	Player->placeShip(1);
-	Player->displayBoard();
+	
+	std::tuple<int, int> t;
+	t = Player->placeShip(3);
+	std::cout << std::get<0>(t) << ", " << std::get<1>(t);
 
 	return 0;
 }

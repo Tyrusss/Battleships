@@ -5,7 +5,7 @@
 #include <iostream>
 #include <tuple>
 
-Game game(10);
+Game game(15);
 
 Board* Player;
 Board* Enemy;
@@ -14,11 +14,7 @@ int main() {
 	Player = &(game.playerBoard);
 	Enemy = &(game.aiBoard);
 
-	Player->displayBoard();
-	
-	std::tuple<int, int> t;
-	//t = Player->placeShip(3);
-	std::cout << std::get<0>(t) << ", " << std::get<1>(t);
+	Player->placeShips();
 
 	return 0;
 }

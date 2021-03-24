@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <string>
+#include <conio.h>
+#include <vector>
 #include <tuple>
 
 Board::Board(int size) { // constructor
@@ -29,18 +31,22 @@ Board::Board(int size) { // constructor
 		case 5:
 			ships_ptr[i - 3].name = "Carrier";
 			ships_ptr[i - 3].length = 5;
+			ships_ptr[i - 3].hits = 0;
 			break;
 		case 4:
 			ships_ptr[i - 3].name = "Battleship";
 			ships_ptr[i - 3].length = 4;
+			ships_ptr[i - 3].hits = 0;
 			break;
 		case 3:
 			ships_ptr[i - 3].name = "Cruiser";
 			ships_ptr[i - 3].length = 3;
+			ships_ptr[i - 3].hits = 0;
 			break;
 		case 2:
 			ships_ptr[i - 3].name = "Destroyer";
 			ships_ptr[i - 3].length = 2;
+			ships_ptr[i - 3].hits = 0;
 			break;
 		default:
 			std::cout << "uh oh, you br0ke it";
@@ -76,12 +82,12 @@ void Board::displayBoard() {
 	for (int row = 0; row < (board_size + 1) ; row++) {
 
 		gridStr += "\t";
-		if (row != 0) { gridStr += (row < 10) ? std::to_string(row) + "  " : std::to_string(row) + " "; }	// y coords
+		if (row != 0) { gridStr += (row < 11) ? std::to_string(row - 1) + "  " : std::to_string(row - 1) + " "; }	// y coords
 		else { gridStr += "   "; }
 
 		for (int col = 0; col < board_size; col++) {
 			if (row == 0) {
-				gridStr += (col < 9) ? std::to_string(col + 1) + "  " : std::to_string(col + 1) + " ";		// x coords
+				gridStr += (col < 10) ? std::to_string(col) + "  " : std::to_string(col) + " ";		// x coords
 			}
 			else {
 				gridStr += grid[row - 1][col];
@@ -94,72 +100,160 @@ void Board::displayBoard() {
 }
 
 void Board::placeShips() {
-
 	for (int i = 0; i < numOfShips; i++) {
+		short x = 0;
+		short y = 0;
+		bool hor = true;
+		bool placed = false;
 
+		int shipLength = ships_ptr[i].length;
 
+		for (int j = x; j < shipLength; j++) {
+			Draw(j, y, (grid[y][j] == SHIP) ? HIT : SHIP);
+		}
+
+		while(!placed) {
+			system("cls");
+			std::cout << "Place down your " << ships_ptr[i].name << "\n";
+			std::cout << "Arrow keys to move, R to rotate\n";
+			std::cout << "Press enter to lock the ship in place\n\n";
+			displayBoard();
+
+			std::cout << x<< y;
+
+			char c = _getch();
+			if (c == -32) {
+				// Arrow keys
+
+				c = _getch();
+				switch (c) {
+				case 72:	// UP_key
+					if (y > 0) {
+						y -= 1;
+						if (hor) {
+							for (int j = x; j < (x + shipLength); j++) {
+								Draw(j, y + 1, (grid[y + 1][j] == HIT) ? SHIP : WATER);
+								Draw(j, y, (grid[y][j] == SHIP) ? HIT : SHIP);
+							}
+						}
+						else {
+							Draw(x, y, (grid[y][x] == SHIP) ? HIT : SHIP);
+							Draw(x, y + shipLength, (grid[y + shipLength][x] == HIT) ? SHIP : WATER);
+						}
+					}
+					break;
+
+				case 80:	// DOWN_key
+					if (hor) {
+						if (y < board_size - 1) {
+							y += 1;
+							for (int j = x; j < (x + shipLength); j++) {
+								Draw(j, y - 1, (grid[y - 1][j] == HIT) ? SHIP : WATER);
+								Draw(j, y, (grid[y][j] == SHIP) ? HIT : SHIP);
+							}
+						}
+					}
+					else {
+						if (y < board_size - (shipLength)) {
+							y += 1;
+							Draw(x, y - 1, (grid[y - 1][x] == HIT) ? SHIP : WATER);
+							Draw(x, y + shipLength - 1, (grid[y + shipLength - 1][x] == SHIP) ? HIT : SHIP);
+						}
+					}
+					break;
+
+				case 75:	// LEFT_key
+					if (x > 0) {
+						x -= 1;
+						if (hor) {
+							Draw(x, y, (grid[y][x] == SHIP) ? HIT : SHIP);
+							Draw(x + shipLength, y, (grid[y][x + shipLength] == HIT) ? SHIP : WATER);
+						}
+						else { // vertical
+							for (int j = y; j < (y + shipLength); j++) {
+								Draw(x + 1, j, (grid[j][x+1] == HIT) ? SHIP : WATER);
+								Draw(x, j, (grid[j][x] == SHIP) ? HIT : SHIP);
+							}
+						}
+					}
+					break;
+
+				case 77:	// RIGHT_key
+					if (hor) { // horizontal
+						if (x < board_size - (shipLength)) {
+							x += 1;
+							Draw(x - 1, y, (grid[y][x-1] == HIT) ? SHIP : WATER);
+							Draw(x + shipLength - 1, y, (grid[y][x + shipLength - 1] == SHIP) ? HIT : SHIP);
+						}
+					}
+					else { // vertical
+						if (x < board_size - 1) {
+							x += 1;
+							for (int j = y; j < (y + shipLength); j++) {
+								Draw(x - 1, j, (grid[j][x-1] == HIT) ? SHIP : WATER);
+								Draw(x, j, (grid[j][x] == SHIP) ? HIT : SHIP);
+							}
+						}
+					}
+					break;
+				}
+
+			}
+			else {
+				// Normal characters
+				switch (c) {
+				case 'r':
+					if (hor) { // horizontal
+						hor = false;
+						for (int j = (x); j < x + shipLength; j++) {
+							Draw(j, y, (grid[y][j] == HIT) ? SHIP : WATER);
+						}
+						if (y > board_size - (shipLength)) {
+							y -= (shipLength - (board_size - y));
+						}
+						for (int j = (y); j < y + shipLength; j++) {
+							Draw(x, j, (grid[j][x] == SHIP) ? HIT : SHIP);
+						}
+					}
+					else { // vertical
+						hor = true;
+						for (int j = (y); j < y + shipLength; j++) {
+							Draw(x, j, (grid[j][x] == HIT) ? SHIP : WATER);
+						}
+						if (x >= board_size - (shipLength - 1)) {
+							x -= (shipLength - (board_size - x));
+						}
+						for (int j = (x); j < x + shipLength; j++) {
+							Draw(j, y, (grid[y][j] == SHIP) ? HIT : SHIP);
+						}
+					}
+					break;
+				case 13:
+					bool valid = true;
+					for (int row = 0; row < board_size; row++) {
+						for (int col = 0; col < board_size; col++) {
+							if (grid[row][col] == HIT) { valid = false; }
+						}
+					}
+					if (valid) {
+						if (hor) {
+							for (int j = 0; j < shipLength; j++) {
+								ships_ptr[i].coordinates.push_back(std::make_tuple(x + j, y));
+							}
+						}
+						else {
+							for (int j = 0; j < shipLength; j++) {
+								ships_ptr[i].coordinates.push_back(std::make_tuple(x, y + j));
+							}
+						}
+						x = 0; y = 0;
+						placed = true;
+					}
+					break;
+				}
+			}
+		}
 	}
-
-	//int startCoord[2];	// The point at which the ship will start
-	//std::string dir;	// The direction of the ship
-	//char xy;
-	//
-	//for (;;) { // input validation
-	//	for (int coord = 0; coord < 2; coord++) {
-
-	//		xy = (coord == 0) ? 'x' : 'y';
-	//		for (;;) {
-	//			std::cout << "Which " << xy << " coordinate do you want the ship to start in?\n";
-
-	//			if (std::cin >> startCoord[coord]			// input must be int
-	//				&& startCoord[coord] <= board_size		// must be <= board_size
-	//				&& startCoord[coord] >= 1	 			// must be >= 1 
-	//				)
-	//			{
-	//				break;
-	//			}
-
-	//			else {
-	//				std::cout << "Please enter a valid coordinate (1 - " << board_size << ")" << std::endl;
-	//				std::cin.clear();
-	//				std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-	//			}
-	//		}
-	//	}
-
-	//	std::cout << "The front of the ship will be at (" << startCoord[0] << "," << startCoord[1] << ")";
-
-	//	std::tuple<int, int> returnDir;
-
-	//	for (;;) {
-	//		std::cout << "\nDo you want the ship to continue UP, RIGHT, DOWN, LEFT, or do you want to RESTART by re-entering the start coordinates?\n";
-
-	//		if (std::cin >> dir) {
-
-	//			if (dir == "UP") // if only switch worked with str
-	//			{
-	//				returnDir = std::make_tuple(0, -1);
-	//				return returnDir;
-	//			}
-	//			if (dir == "RIGHT") {
-	//				returnDir = std::make_tuple(1, 0);
-	//				return returnDir;
-	//			}
-	//			if (dir == "LEFT") {
-	//				returnDir = std::make_tuple(-1, 0);
-	//				return returnDir;
-	//			}
-	//			if (dir == "DOWN") {
-	//				returnDir = std::make_tuple(0, 1);
-	//				return returnDir;
-	//			}
-	//			if (dir == "RESTART") {
-	//				break;
-	//			}
-	//		}
-	//		else { std::cout << "Please enter a valid response"; }
-	//	}
-	//}
 }
 
 void Board::Draw(int col, int row, char newElement) {

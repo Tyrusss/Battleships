@@ -30,12 +30,10 @@ private:
 };
 
 struct Ship {
-	std::string name;	// Carrier (5), Battleship (4), Cruiser (3), Destroyer (2)
-	int length;			// Length of the ship
-	int xCoord;			// Starting x Coordinate
-	int yCoord;			// Starting y Coordinate
-	int horizontalDir;	// 1 = right, -1 = left, 0 = no change
-	int verticalDir;	// 1 = down, -1 = up, 0 = no change
+	std::string name;								// Carrier (5), Battleship (4), Cruiser (3), Destroyer (2)
+	int length;										// Length of the ship
+	std::vector<std::tuple<int, int>> coordinates;	// Coordinates the ship takes up
+	int hits;										// Number of hits the ship has taken
 };
 
 

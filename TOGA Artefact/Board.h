@@ -12,7 +12,7 @@ class Board {
 public:
 	void initBoard();
 	void displayBoard();
-	std::tuple<int, int> placeShip(int shipSize);
+	void placeShips();
 
 	Board(int size);
 	~Board();
@@ -20,7 +20,8 @@ public:
 private:
 	int board_size;							// size of the grid (board_size 10 gives a 10x10 grid)
 	std::vector<std::vector<char>> grid;	// 2D vector containing the grid spaces
-	int numOfShips;							// the number of ships that will populate the board
+	
+	int numOfShips;
 
 	Ship* ships_ptr;
 
@@ -29,6 +30,7 @@ private:
 };
 
 struct Ship {
+	std::string name;	// Carrier (5), Battleship (4), Cruiser (3), Destroyer (2)
 	int length;			// Length of the ship
 	int xCoord;			// Starting x Coordinate
 	int yCoord;			// Starting y Coordinate

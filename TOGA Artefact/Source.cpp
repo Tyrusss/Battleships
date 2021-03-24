@@ -5,20 +5,19 @@
 #include <iostream>
 #include <tuple>
 
-Game game(20);
+Game game(10);
 
 Board* Player;
 Board* Enemy;
 
 int main() {
-
 	Player = &(game.playerBoard);
 	Enemy = &(game.aiBoard);
 
 	Player->displayBoard();
 	
 	std::tuple<int, int> t;
-	t = Player->placeShip(3);
+	//t = Player->placeShip(3);
 	std::cout << std::get<0>(t) << ", " << std::get<1>(t);
 
 	return 0;

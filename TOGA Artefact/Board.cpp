@@ -1,9 +1,11 @@
 #include "Board.h"
 #include "Macros.h"
+#include "textHandling.h"
 
 #include <iostream>
 #include <string>
 #include <conio.h>
+
 #include <vector>
 #include <tuple>
 
@@ -74,32 +76,38 @@ void Board::initBoard() {
 }
 
 void Board::displayBoard() {
+	consoleCursorVisible(false);
 
-	std::cout << "\n"; //newline
+	// Top axis
+	for (int x = 0; x < (3 * board_size); x += 3) {
+		setCursorPosition(x+11, 4);
+		char c = x/3; // divide to compensate for loop steps
+		c = c + 'A'; // numeric value -> alpha value
+		std::cout << c;
+	}	
 
-	std::string gridStr;
+	// Left axis
+	for (int y = 0; y < board_size; y++) {			//  8	print numbers
+		setCursorPosition((y<10) ? 7 : 6, y + 6);	//  9   from right
+		std::cout << y;								// 10   to left
+	}												// 11
 
-	for (int row = 0; row < (board_size + 1) ; row++) {
-
-		gridStr += "\t";
-		if (row != 0) { gridStr += (row < 11) ? std::to_string(row - 1) + "  " : std::to_string(row - 1) + " "; }	// y coords
-		else { gridStr += "   "; }
-
-		for (int col = 0; col < board_size; col++) {
-			if (row == 0) {
-				gridStr += (col < 10) ? std::to_string(col) + "  " : std::to_string(col) + " ";		// x coords
-			}
-			else {
-				gridStr += grid[row - 1][col];
-				gridStr += "  ";
-			}
+	for (int x = 0; x < (3*board_size); x+= 3) {
+		for (int y = 0; y < board_size; y++) {
+			setCursorPosition(x + 11, y + 6);
+			std::cout << grid[y][x/3];
 		}
-		gridStr += "\n";
 	}
-	std::cout << gridStr;
+	consoleCursorVisible(true);
 }
 
 void Board::placeShips() {
+	std::string firstLine = "Place down your "; // If this line changes I won't have to change it in 2 places, as it's used at the bottom of the first for loop
+
+	std::cout << firstLine << "Carrier\n";
+	std::cout << "Arrow keys to move, R to rotate\n";
+	std::cout << "Press enter to lock the ship in place\n\n";
+
 	for (int i = 0; i < numOfShips; i++) {
 		short x = 0;
 		short y = 0;
@@ -113,12 +121,10 @@ void Board::placeShips() {
 		}
 
 		while(!placed) {
-			system("cls");
-			std::cout << "Place down your " << ships_ptr[i].name << "\n";
-			std::cout << "Arrow keys to move, R to rotate\n";
-			std::cout << "Press enter to lock the ship in place\n\n";
+			
 			displayBoard();
 
+			setCursorPosition(0, board_size + 6);
 			std::cout << x<< y;
 
 			char c = _getch();
@@ -157,7 +163,7 @@ void Board::placeShips() {
 						if (y < board_size - (shipLength)) {
 							y += 1;
 							Draw(x, y - 1, (grid[y - 1][x] == HIT) ? SHIP : WATER);
-							Draw(x, y + shipLength - 1, (grid[y + shipLength - 1][x] == SHIP) ? HIT : SHIP);
+							Draw(x, y + shipLength - 1, (grid[int(y) + shipLength - 1][x] == SHIP) ? HIT : SHIP);
 						}
 					}
 					break;
@@ -253,6 +259,8 @@ void Board::placeShips() {
 				}
 			}
 		}
+		setCursorPosition(firstLine.length(), 0);
+		std::cout << ships_ptr[i + 1].name << "      "; // 
 	}
 }
 

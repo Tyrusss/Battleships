@@ -13,18 +13,18 @@ public:
 	void initBoard();
 	void displayBoard();
 	void placeShips();
+	void checkForHit();
 
 	Board(int size);
 	~Board();
 
-private:
+protected:
 	int board_size;							// size of the grid (board_size 10 gives a 10x10 grid)
-	std::vector<std::vector<char>> grid;	// 2D vector containing the grid spaces
-	
 	int numOfShips;
+	Ship* ships_ptr;						// Dynamic array containing all the ships on the board
 
-	Ship* ships_ptr;
-
+private:
+	std::vector<std::vector<char>> grid;	// 2D vector containing the grid spaces
 	void Draw(int col, int row, char newElement);
 
 };
@@ -36,5 +36,12 @@ struct Ship {
 	int hits;										// Number of hits the ship has taken
 };
 
+//class EnemyBoard : public Board {
+//
+//public:
+//	void placeShips();
+//
+//	EnemyBoard(int size);
+//};
 
 #endif

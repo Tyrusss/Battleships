@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include <conio.h>
+//#include <stdlib.h>
 
 #include <vector>
 #include <tuple>
@@ -13,6 +14,7 @@ Board::Board(int size) { // constructor
 
 	board_size = size;
 
+	// Clamping
 	if (board_size > 25) { board_size = 25; }
 	else if (board_size < 6) { board_size = 6; }
 
@@ -23,12 +25,15 @@ Board::Board(int size) { // constructor
 									// e.g. for a board_size 10 there will be six ships,
 									// two size 5 ships, two size 4 ships, one size 3 ship, and one size 2 ship.
 
-	ships_ptr = new Ship[numOfShips];
+	ships_ptr = new Ship[numOfShips]; // Dynamic array declaration (deleted in destructor)
 
 	int temp;
 	for (int i = 3; i < numOfShips + 3; i++) {
-		temp = (((i * 3) + 2) % 4) + 2;			// closed function for above repeating pattern (5,4,3,2,5,4,3,2,5,4,...)
 
+		// Closed function for above repeating pattern (5,4,3,2,5,4,3,2,5,4,...)
+		temp = (((i * 3) + 2) % 4) + 2;
+
+		// Initialise array of ships with name, length, and hits
 		switch (temp) {
 		case 5:
 			ships_ptr[i - 3].name = "Carrier";
@@ -79,7 +84,7 @@ void Board::displayBoard() {
 	consoleCursorVisible(false);
 
 	// Top axis
-	for (int x = 0; x < (3 * board_size); x += 3) {
+	for (int x = 0; x < (3 * board_size); x += 3) { // Step by 3 to space out rows and columns evenly
 		setCursorPosition(x+11, 4);
 		char c = x/3; // divide to compensate for loop steps
 		c = c + 'A'; // numeric value -> alpha value
@@ -92,9 +97,10 @@ void Board::displayBoard() {
 		std::cout << y;								// 10   to left
 	}												// 11
 
+	// Main grid
 	for (int x = 0; x < (3*board_size); x+= 3) {
 		for (int y = 0; y < board_size; y++) {
-			setCursorPosition(x + 11, y + 6);
+			setCursorPosition(x + 11, y + 6); // offset grid position for aesthetics
 			std::cout << grid[y][x/3];
 		}
 	}
@@ -102,7 +108,9 @@ void Board::displayBoard() {
 }
 
 void Board::placeShips() {
-	std::string firstLine = "Place down your "; // If this line changes I won't have to change it in 2 places, as it's used at the bottom of the first for loop
+	std::string firstLine = "Place down your "; // If this line changes I won't have to change it in 2 places, as it's used at the bottom of the for loop
+
+	setCursorPosition(0, 0);
 
 	std::cout << firstLine << "Carrier\n";
 	std::cout << "Arrow keys to move, R to rotate\n";
@@ -149,25 +157,6 @@ void Board::placeShips() {
 					}
 					break;
 
-				case 80:	// DOWN_key
-					if (hor) {
-						if (y < board_size - 1) {
-							y += 1;
-							for (int j = x; j < (x + shipLength); j++) {
-								Draw(j, y - 1, (grid[y - 1][j] == HIT) ? SHIP : WATER);
-								Draw(j, y, (grid[y][j] == SHIP) ? HIT : SHIP);
-							}
-						}
-					}
-					else {
-						if (y < board_size - (shipLength)) {
-							y += 1;
-							Draw(x, y - 1, (grid[y - 1][x] == HIT) ? SHIP : WATER);
-							Draw(x, y + shipLength - 1, (grid[int(y) + shipLength - 1][x] == SHIP) ? HIT : SHIP);
-						}
-					}
-					break;
-
 				case 75:	// LEFT_key
 					if (x > 0) {
 						x -= 1;
@@ -199,6 +188,25 @@ void Board::placeShips() {
 								Draw(x - 1, j, (grid[j][x-1] == HIT) ? SHIP : WATER);
 								Draw(x, j, (grid[j][x] == SHIP) ? HIT : SHIP);
 							}
+						}
+					}
+					break;
+
+				case 80:	// DOWN_key
+					if (hor) {
+						if (y < board_size - 1) {
+							y += 1;
+							for (int j = x; j < (x + shipLength); j++) {
+								Draw(j, y - 1, (grid[y - 1][j] == HIT) ? SHIP : WATER);
+								Draw(j, y, (grid[y][j] == SHIP) ? HIT : SHIP);
+							}
+						}
+					}
+					else {
+						if (y < board_size - (shipLength)) {
+							y += 1;
+							Draw(x, y - 1, (grid[y - 1][x] == HIT) ? SHIP : WATER);
+							Draw(x, y + shipLength - 1, (grid[int(y) + shipLength - 1][x] == SHIP) ? HIT : SHIP);
 						}
 					}
 					break;
@@ -259,11 +267,46 @@ void Board::placeShips() {
 				}
 			}
 		}
-		setCursorPosition(firstLine.length(), 0);
-		std::cout << ships_ptr[i + 1].name << "      "; // 
+		if (i < numOfShips - 1) {
+			setCursorPosition(firstLine.length(), 0);
+			std::cout << ships_ptr[i + 1].name << "      "; // overwrite ship name with next ship 
+		}
+	}
+}
+
+void Board::checkForHit() {
+	for (int i = 0; i < numOfShips; i++) {
+		for (int j = 0; j < ships_ptr[i].coordinates.size(); j++) {
+
+			std::get<0>(ships_ptr[i].coordinates[j]);
+			std::get<1>(ships_ptr[i].coordinates[j]);
+
+		}
 	}
 }
 
 void Board::Draw(int col, int row, char newElement) {
 	grid[row][col] = newElement;
 }
+
+//EnemyBoard::EnemyBoard(int size) : Board{ size } {
+//	placeShips();
+//}
+//
+//void EnemyBoard::placeShips() {
+//
+//	int x;
+//	int y;
+//
+//	setCursorPosition(0, board_size + 8);
+//	
+//	for (int i = 0; i < numOfShips; i++) {
+//		for (int j = 0; j < ships_ptr[i].coordinates.size(); j++) {
+//
+//			
+//
+//		}
+//
+//	}
+//
+//}

@@ -8,11 +8,13 @@
 Game game(15);
 
 Board* Player;
-Board* Enemy;
+//EnemyBoard* Enemy;
 
 int main() {
+	srand(time(NULL)); // initialise RNG seed
+
 	Player = &(game.playerBoard);
-	Enemy = &(game.aiBoard);
+	//Enemy = &(game.aiBoard);
 
 	Player->placeShips();
 

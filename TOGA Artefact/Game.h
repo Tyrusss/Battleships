@@ -7,7 +7,7 @@ class Game {
 public:
 	int size;
 	Board playerBoard;
-	Board aiBoard;
+	//EnemyBoard aiBoard;
 
 	Game(int boardSize);
 

@@ -13,7 +13,6 @@ public:
 	void initBoard();
 	void displayBoard();
 	void placeShips();
-	void checkForHit();
 
 	Board(int size);
 	~Board();

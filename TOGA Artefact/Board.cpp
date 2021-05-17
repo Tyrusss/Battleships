@@ -119,14 +119,19 @@ void Board::placeShips() {
 	for (int i = 0; i < numOfShips; i++) {
 		short x = 0;
 		short y = 0;
-		bool hor = true;
-		bool placed = false;
+		bool hor = true; // If the ship is currently horizontal
+		bool placed = false; // If it has been placed down
 
 		int shipLength = ships_ptr[i].length;
 
+		// If the ship is being drawn over the top of a ship that has been placed
+		// down, then draw the spaces as crosses. If there is no overlap, then draw
+		// the spaces as S's
+
+		// Draw the ship in the top left corner to begin
 		for (int j = x; j < shipLength; j++) {
 			Draw(j, y, (grid[y][j] == SHIP) ? HIT : SHIP);
-		}
+		} 
 
 		while(!placed) {
 			
@@ -139,26 +144,38 @@ void Board::placeShips() {
 			if (c == -32) {
 				// Arrow keys
 
-				c = _getch();
+				c = _getch(); // Arrow keys require a second getch_() call
 				switch (c) {
-				case 72:	// UP_key
-					if (y > 0) {
-						y -= 1;
+				case 72:	// UP_key moves the ship up
+
+					// Don't move the ship if it's at the top of the grid
+					if (y > 0) { 
+
+						// Move y upwards
+						y -= 1; 
+
+						// If the ship is horizontal
 						if (hor) {
-							for (int j = x; j < (x + shipLength); j++) {
-								Draw(j, y + 1, (grid[y + 1][j] == HIT) ? SHIP : WATER);
-								Draw(j, y, (grid[y][j] == SHIP) ? HIT : SHIP);
+							for (int j = x; j < (x + shipLength); j++) {					// move each
+								Draw(j, y + 1, (grid[y + 1][j] == HIT) ? SHIP : WATER);		// point
+								Draw(j, y, (grid[y][j] == SHIP) ? HIT : SHIP);				// upwards once
 							}
 						}
-						else {
+
+						// If the ship is vertical
+						else { 
+
+							// Draw a space above the top
 							Draw(x, y, (grid[y][x] == SHIP) ? HIT : SHIP);
+
+							// Remove the space at the bottom
 							Draw(x, y + shipLength, (grid[y + shipLength][x] == HIT) ? SHIP : WATER);
 						}
 					}
 					break;
 
-				case 75:	// LEFT_key
-					if (x > 0) {
+				case 75:	// LEFT_key moves the ship left
+					if (x > 0) {// Don't move the ship if it's at the left of the grid
 						x -= 1;
 						if (hor) {
 							Draw(x, y, (grid[y][x] == SHIP) ? HIT : SHIP);
@@ -173,9 +190,9 @@ void Board::placeShips() {
 					}
 					break;
 
-				case 77:	// RIGHT_key
+				case 77:	// RIGHT_key moves the ship right
 					if (hor) { // horizontal
-						if (x < board_size - (shipLength)) {
+						if (x < board_size - (shipLength)) { // Don't move the ship if it's at the right of the grid
 							x += 1;
 							Draw(x - 1, y, (grid[y][x-1] == HIT) ? SHIP : WATER);
 							Draw(x + shipLength - 1, y, (grid[y][x + shipLength - 1] == SHIP) ? HIT : SHIP);
@@ -192,9 +209,9 @@ void Board::placeShips() {
 					}
 					break;
 
-				case 80:	// DOWN_key
+				case 80:	// DOWN_key moves the ship down
 					if (hor) {
-						if (y < board_size - 1) {
+						if (y < board_size - 1) { // Don't move the ship if it's at the bottom of the grid
 							y += 1;
 							for (int j = x; j < (x + shipLength); j++) {
 								Draw(j, y - 1, (grid[y - 1][j] == HIT) ? SHIP : WATER);
@@ -216,7 +233,7 @@ void Board::placeShips() {
 			else {
 				// Normal characters
 				switch (c) {
-				case 'r':
+				case 'r': // r rotates the ship
 					if (hor) { // horizontal
 						hor = false;
 						for (int j = (x); j < x + shipLength; j++) {
@@ -242,7 +259,7 @@ void Board::placeShips() {
 						}
 					}
 					break;
-				case 13:
+				case 13: // enter locks the ship in place
 					bool valid = true;
 					for (int row = 0; row < board_size; row++) {
 						for (int col = 0; col < board_size; col++) {
@@ -274,16 +291,6 @@ void Board::placeShips() {
 	}
 }
 
-void Board::checkForHit() {
-	for (int i = 0; i < numOfShips; i++) {
-		for (int j = 0; j < ships_ptr[i].coordinates.size(); j++) {
-
-			std::get<0>(ships_ptr[i].coordinates[j]);
-			std::get<1>(ships_ptr[i].coordinates[j]);
-
-		}
-	}
-}
 
 void Board::Draw(int col, int row, char newElement) {
 	grid[row][col] = newElement;
